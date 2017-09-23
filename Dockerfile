@@ -9,23 +9,24 @@ RUN yum install -y wget
 
 #更换yum源 
 RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup \
-	&& wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
-	&& yum clean all \
-	&& yum makecache 
-	
+  && wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+  && yum clean all \
+  && yum makecache 
+  
 #安装工具集
 RUN yum install -y zlib zlib-devel pcre pcre-devel gcc gcc-c++ openssl openssl-devel libevent libevent-devel perl unzip net-tools git
 
-	
+  
 #配置环境变量
 ENV CENTOS_VERSION=7 \
-	USER_ROOT=/home/imlzw \
-	FASTDFS_PATH=/home/imlzw/fastdfs \
+  USER_ROOT=/home/imlzw \
+  FASTDFS_PATH=/home/imlzw/fastdfs \
     FASTDFS_STORAGE_PATH=/home/imlzw/fastdfs/storage \
     FASTDFS_STORAGE_DATA_PATH=/home/imlzw/fastdfs/storage/data \
     LIB_FAST_COMMON_VERSION=1.0.35 \
     FASTDFS_VERSION=5.09 \
-    NGINX_VERSION=1.11.7 
+    NGINX_VERSION=1.11.7 \
+    FASTDFS_NGINX_VERSION=5a8110f57ec55ff580260cf1fc6aa152a5a4c574
 
 #创建必要的目录
 RUN mkdir -p ${FASTDFS_PATH}/download \
@@ -36,11 +37,11 @@ RUN mkdir -p ${FASTDFS_PATH}/download \
 #下载
 RUN wget "https://github.com/happyfish100/libfastcommon/archive/V${LIB_FAST_COMMON_VERSION}.tar.gz" -P ${FASTDFS_PATH}/download/libfastcommon
 RUN wget "https://github.com/happyfish100/fastdfs/archive/V${FASTDFS_VERSION}.tar.gz" -P ${FASTDFS_PATH}/download/fastdfs
-RUN wget https://github.com/happyfish100/fastdfs-nginx-module/archive/master.zip -P ${FASTDFS_PATH}/download/nginx_module 
+RUN wget https://github.com/happyfish100/fastdfs-nginx-module/archive/${FASTDFS_NGINX_VERSION}.zip -P ${FASTDFS_PATH}/download/nginx_module
 RUN wget "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" -P ${FASTDFS_PATH}/download/nginx 
 RUN tar zxvf ${FASTDFS_PATH}/download/libfastcommon/V${LIB_FAST_COMMON_VERSION}.tar.gz -C ${FASTDFS_PATH}/download/libfastcommon \
  && tar zxvf ${FASTDFS_PATH}/download/fastdfs/V${FASTDFS_VERSION}.tar.gz -C ${FASTDFS_PATH}/download/fastdfs \
- && unzip ${FASTDFS_PATH}/download/nginx_module/master.zip -d ${FASTDFS_PATH}/download/nginx_module \
+ && unzip ${FASTDFS_PATH}/download/nginx_module/${FASTDFS_NGINX_VERSION}.zip -d ${FASTDFS_PATH}/download/nginx_module \
  && tar zxvf ${FASTDFS_PATH}/download/nginx/nginx-${NGINX_VERSION}.tar.gz -C ${FASTDFS_PATH}/download/nginx 
 
 #安装libfastcommon
@@ -53,10 +54,10 @@ RUN ["/bin/bash", "-c", "./make.sh && ./make.sh install && cp conf/* /etc/fdfs/"
 
 #安装nginx
 WORKDIR ${FASTDFS_PATH}/download/nginx/nginx-${NGINX_VERSION}
-RUN ./configure --add-module=${FASTDFS_PATH}/download/nginx_module/fastdfs-nginx-module-master/src \
+RUN ./configure --add-module=${FASTDFS_PATH}/download/nginx_module/fastdfs-nginx-module-${FASTDFS_NGINX_VERSION}/src \
  && make \
  && make install \
- && cp ${FASTDFS_PATH}/download/nginx_module/fastdfs-nginx-module-master/src/mod_fastdfs.conf /etc/fdfs/
+ && cp ${FASTDFS_PATH}/download/nginx_module/fastdfs-nginx-module-${FASTDFS_NGINX_VERSION}/src/mod_fastdfs.conf /etc/fdfs/
  
 #添加初始化配置
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
