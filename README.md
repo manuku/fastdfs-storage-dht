@@ -1,4 +1,6 @@
 # fastdfs服务集合
+[![](https://images.microbadger.com/badges/version/manuku/fastdfs-storage-dht.svg)](https://microbadger.com/images/manuku/fastdfs-storage-dht "Get your own version badge on microbadger.com")
+
 fastdfs的服务集合，包含tracker与storage服务，集成阿里云的yum.repo,使安装速度更加快速！
 
 # 使用简介
