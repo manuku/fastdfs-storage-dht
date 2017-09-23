@@ -1,2 +1,2 @@
-docker build -t imlzw/fastdfs-storage-dht ./
+docker build -t manuku/fastdfs-storage-dht ./
 pause
